@@ -28,6 +28,5 @@
       ]
     }
   ],
-  "cleanUrls": true,
-  "excludeFiles": "{source,tools,assets}/**"
+  "cleanUrls": true
 }
