@@ -39,7 +39,10 @@
     display:inline-block;padding:6px 14px;border-radius:2px;margin-top:18px;}
   .card .meta{font-size:17px;line-height:1.5;color:#E9E2D8;margin-top:18px;font-style:italic;}
   .card .foot{font-family:var(--board);font-size:10px;letter-spacing:.26em;color:#4E5654;margin-top:22px;}
-  .card .shot{font-family:var(--board);font-size:11px;letter-spacing:.2em;color:#6E7674;margin-top:16px;}
+  .card .share{font-family:var(--board);font-size:12px;letter-spacing:.16em;color:#1A2005;background:var(--ball);
+    border:1px solid var(--ball);border-radius:999px;padding:11px 18px;margin-top:18px;cursor:pointer;}
+  .card .share:hover{filter:brightness(1.08);}
+  .card .share:focus-visible{outline:2px solid #fff;outline-offset:3px;}
   .ledWrap{position:absolute;z-index:4;pointer-events:none;background:#07090C;
     border:1px solid rgba(255,177,46,.16);border-radius:2px;
     box-shadow:0 0 40px rgba(255,150,20,.16),inset 0 0 26px rgba(0,0,0,.85);overflow:hidden;}
@@ -249,7 +252,7 @@
       <div class="nm" id="cardB">Mounika</div>
       <div class="res" id="cardRes">6-4 &middot; Match point saved</div>
       <div class="meta" id="cardMeta"></div>
-      <div class="shot">Screenshot this</div>
+      <button class="share" id="btnShare" type="button">Share this match</button>
       <div class="foot" id="cardFoot"></div>
     </div></div>
     <div class="cue" id="cue">Scroll</div>
@@ -277,7 +280,7 @@ var CAPTURE=/[?&]capture=1/.test(location.search);
    Edit only this block to rebuild for a new couple.
    ============================================================ */
 var CONFIG={
-  studio:{ name:"STUDIO NAME", url:"https://example.com" },
+  studio:{ name:"SHAPESHYFT", url:"https://example.com" },
   players:{ near:"Abhi", far:"Mounika" },
   brief:"Twenty-one days of talking and not one minute in the same room. One set all, advantage Abhi, serving for the match.",
   ask:"One coffee. You pick the place. I'll get there early and pretend I didn't. And if it's terrible we go back to texting and never speak of it again.",
@@ -1196,6 +1199,33 @@ document.getElementById("btnCard").addEventListener("click",function(){
 document.getElementById("card").addEventListener("click",function(){
   this.classList.remove("on");
 });
+document.getElementById("btnShare").addEventListener("click",function(e){
+  e.stopPropagation();
+  var btn=this;
+  var shareData={
+    title:"Game. Set. Match. — Abhi & Mounika",
+    text:"Game. Set. Match. 🎾 See how Abhi and Mounika's story played out on Centre Court.",
+    url:location.origin+location.pathname
+  };
+  if(navigator.share){
+    navigator.share(shareData).catch(function(err){
+      if(err&&err.name!=="AbortError") copyShareLink(btn,shareData.url);
+    });
+  }else{
+    copyShareLink(btn,shareData.url);
+  }
+});
+function copyShareLink(btn,url){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(function(){showShareResult(btn,"Link copied");});
+  }else{
+    window.prompt("Copy this link to share",url);
+  }
+}
+function showShareResult(btn,label){
+  var old=btn.textContent; btn.textContent=label;
+  setTimeout(function(){btn.textContent=old;},1800);
+}
 Array.prototype.forEach.call(document.querySelectorAll(".venue"),function(b){
   b.addEventListener("click",function(){
     var v=VENUES[+b.getAttribute("data-v")];
